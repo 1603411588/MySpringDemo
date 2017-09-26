@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.liuyi.dao.PersonMapper">
+
+	<select id="findAll" resultType="com.liuyi.entity.Person">
+		select * from person
+	</select>
+	
+	<insert id="add" parameterType="com.liuyi.entity.Person">
+		insert into Person(name,sex,birth,idCard) values(#{name},#{sex},#{birth},#{idCard})
+	</insert>
+</mapper>
