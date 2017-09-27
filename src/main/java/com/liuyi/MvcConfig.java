@@ -16,7 +16,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(includeFilters = { @Filter(type = FilterType.ANNOTATION, value = Controller.class) })
+@ComponentScan(useDefaultFilters = false, includeFilters = { @Filter(type = FilterType.ANNOTATION, value = Controller.class) })
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
 	@Bean(name = "jspViewResolver")

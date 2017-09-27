@@ -1,4 +1,4 @@
-package com.liuyi.entity;
+package com.liuyi.util;
 
 import java.util.List;
 

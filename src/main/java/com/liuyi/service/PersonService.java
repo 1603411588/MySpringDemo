@@ -2,8 +2,8 @@ package com.liuyi.service;
 
 import java.util.List;
 
-import com.liuyi.entity.PageQueryResult;
 import com.liuyi.entity.Person;
+import com.liuyi.util.PageQueryResult;
 
 public interface PersonService {
 

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.liuyi.dao.PersonMapper;
-import com.liuyi.entity.PageQueryResult;
 import com.liuyi.entity.Person;
+import com.liuyi.util.PageQueryResult;
 
 @Service
 public class PersonServiceImpl implements PersonService {
