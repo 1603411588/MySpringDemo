@@ -3,6 +3,7 @@ package com.liuyi.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.github.pagehelper.Page;
@@ -18,6 +19,7 @@ public class PersonServiceImpl implements PersonService {
 	private PersonMapper personMapper;
 
 	@Override
+	@Cacheable(value = "redis.person", keyGenerator = "redisKeyGenerator")
 	public List<Person> findAllPerson() {
 		List<Person> findAll = personMapper.findAll();
 		return findAll;
@@ -30,7 +32,7 @@ public class PersonServiceImpl implements PersonService {
 
 	@Override
 	public PageQueryResult<Person> pageQuery(Integer pageNum, Integer pageSize) {
-		Page<Person> page = PageHelper.startPage(pageNum, pageSize," name asc");
+		Page<Person> page = PageHelper.startPage(pageNum, pageSize, " name asc");
 		List<Person> rows = personMapper.findAll();
 		long total = page.getTotal();
 		PageQueryResult<Person> result = new PageQueryResult<>();

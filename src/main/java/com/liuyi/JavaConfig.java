@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Controller;
 
@@ -44,6 +45,12 @@ public class JavaConfig implements EnvironmentAware {
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
 		transactionManager.setDataSource(dataSource);
 		return transactionManager;
+	}
+
+	@Bean
+	public JdbcTemplate jdbcTemplate(DataSource dataSource) throws SQLException {
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		return jdbcTemplate;
 	}
 
 	@Override

@@ -47,5 +47,10 @@ public class HelloController {
 		FileUtils.copyInputStreamToFile(file.getInputStream(), new File(pathname));
 		return "SUCCESS";
 	}
-
+	
+	@RequestMapping("/testRedisLock")
+	@ResponseBody
+	public void testRedisLock(){
+		
+	}
 }
