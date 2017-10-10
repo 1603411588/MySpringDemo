@@ -3,9 +3,13 @@ package com.liuyi.controller;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -19,11 +23,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.zxing.datamatrix.encoder.SymbolShapeHint;
 import com.liuyi.entity.CitiesPre;
 import com.liuyi.entity.City;
 import com.liuyi.entity.Person;
@@ -52,47 +59,40 @@ public class HelloController {
 
 	private static final String key = "LY_LY_Test_Queue_Inventory";
 	private static final String lock_key = "LY_LY_Test_Lock_Key";
-	
-	@RequestMapping("/test")
+
+	@RequestMapping(value = "/testJson", produces = { "text/json;charset=UTF-8" })
 	@ResponseBody
-	public String test(HttpServletRequest request) throws IOException{
-		String string = IOUtils.toString(request.getInputStream(), "UTF-8");
-		Map<String, List<Map<String, Object>>> resultMap = new HashMap<>();
-		Map<String,List<Map<String, Object>>> unmarshal = JsonUtils.unmarshal(string, Map.class);
-		List<Map<String, Object>> list = unmarshal.get("data");
-		for (Map<String, Object> map : list) {
-			List<Map<String, Object>> resultList = new ArrayList<>();
-			String string2 = map.get("city").toString();
-			String title = map.get("title").toString();
-			List<Object> list2 = JsonUtils.unmarshal(string2, List.class);
-			/*for (Map<String, Object> map2 : list2) {
-				String city_child = map2.get("city_child").toString();
-				String city_parent = map2.get("city_parent").toString();
-				Map<String, Object> map3 = new HashMap<>();
-				if (city_child.equals(city_parent)) {
-//					 "city_id": 101271901,
-					map3.put("city_id", map2.get("city_id").toString());
-//			            "city_name": "阿坝",
-					map3.put("city_name", map2.get("city_child").toString());
-//			            "city_name_ab": "ab",
-					map3.put("city_name_ab", map2.get("city_name_ab").toString());
-//			            "province": "四川"
-					map3.put("province", map2.get("provcn").toString());
-				}*/
+	public String test(@RequestBody JsonNode data) throws IOException {
+		System.out.println(data);
+		Iterator<JsonNode> iterator = data.get("data").iterator();
+		Map<String, Set<Map<String, Object>>> resultMap = new HashMap<>();
+		while (iterator.hasNext()) {
+			List<Map<String, Object>> list = new ArrayList<>();
+			JsonNode next = iterator.next();
+			Iterator<JsonNode> cityIter = next.get("city").iterator();
+			String title = next.get("title").toString();
+			while (cityIter.hasNext()) {
+				JsonNode next2 = cityIter.next();
+				String city_child = next2.get("city_child").toString();
+				String city_parent = next2.get("city_parent").toString();
+				if (city_child.equalsIgnoreCase(city_parent)) {
+					Map<String, Object> map = new HashMap<>();
+					map.put("city_id", next2.get("city_id").asLong());
+					map.put("city_name", next2.get("city_child").asText());
+					map.put("city_name_ab", next2.get("city_name_ab").asText());
+					map.put("province", next2.get("provcn").toString());
+					list.add(map);
+				}
 			}
-			//resultMap.put(title, resultList);
-		/*JSONObject fromObject = JSONObject.fromObject(string);
-		JSONArray jsonArray = fromObject.getJSONArray("data");
-		for (Object object : jsonArray) {
-			JSONObject fromObject2 = JSONObject.fromObject(object);
-			String string2 = fromObject2.getString("title");
-			JSONArray jsonArray2 = fromObject2.getJSONArray("city");
-			for (Object object2 : jsonArray2) {
-				JSONObject fromObject3 = JSONObject.fromObject(object2);
-				String city_child = fromObject3.getString("city_child");
-				String city_parent = fromObject3.getString("city_parent");
-			}
-		}*/
+			Set<Map<String, Object>> set = new TreeSet<>(new Comparator<Map<String, Object>>() {
+				@Override
+				public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+					return o1.get("city_id").toString().compareTo(o2.get("city_id").toString());
+				}
+			});
+			set.addAll(list);
+			resultMap.put(title, set);
+		}
 		return JsonUtils.marshal(resultMap);
 	}
 
