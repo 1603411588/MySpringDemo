@@ -9,10 +9,12 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
+@SuppressWarnings("unchecked")
 public class RedisServiceImpl implements RedisService {
 
+	@SuppressWarnings("rawtypes")
 	@Autowired
-	private RedisTemplate<String, Object> redisTemplate;
+	private RedisTemplate redisTemplate;
 
 	@Override
 	public List<?> findListFromCache(String key) {
@@ -30,13 +32,12 @@ public class RedisServiceImpl implements RedisService {
 	@Override
 	public void updateCache(String key, List<?> cacheList) {
 		redisTemplate.delete(key);
-		redisTemplate.opsForList().leftPushAll(key, cacheList);
+		redisTemplate.opsForList().rightPushAll(key, cacheList);
 	}
 
 	@Override
 	public void updateCache(String key, List<?> cacheList, long timeout, TimeUnit unit) {
-		redisTemplate.delete(key);
-		redisTemplate.opsForList().rightPushAll(key, cacheList);
+		updateCache(key, cacheList);
 		redisTemplate.expire(key, timeout, unit);
 	}
 
@@ -48,9 +49,7 @@ public class RedisServiceImpl implements RedisService {
 
 	@Override
 	public void updateCache(String key, Map<String, Object> cacheMap, long timeout, TimeUnit unit) {
-		redisTemplate.delete(key);
-		cacheMap.put("updateDate", System.currentTimeMillis());
-		redisTemplate.opsForHash().putAll(key, cacheMap);
+		updateCache(key, cacheMap);
 		redisTemplate.expire(key, timeout, unit);
 	}
 

@@ -13,6 +13,8 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @EnableCaching
@@ -30,9 +32,11 @@ public class RedisConfig {
 	}
 
 	@Bean
-	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory cf) {
-		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
+	public RedisTemplate<String, ?> redisTemplate(RedisConnectionFactory cf) {
+		RedisTemplate<String, ?> redisTemplate = new RedisTemplate<>();
 		redisTemplate.setConnectionFactory(cf);
+		redisTemplate.setKeySerializer(new StringRedisSerializer());
+		redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
 		return redisTemplate;
 	}
 
