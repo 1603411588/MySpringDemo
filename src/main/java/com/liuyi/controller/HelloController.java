@@ -3,6 +3,7 @@ package com.liuyi.controller;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,12 +14,10 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,20 +26,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.zxing.datamatrix.encoder.SymbolShapeHint;
-import com.liuyi.entity.CitiesPre;
-import com.liuyi.entity.City;
 import com.liuyi.entity.Person;
+import com.liuyi.event.CommonMessageEvent;
+import com.liuyi.service.HelloService;
 import com.liuyi.service.PersonService;
 import com.liuyi.service.RedisLockService;
 import com.liuyi.service.RedisService;
+import com.liuyi.util.ContextUtils;
 import com.liuyi.util.JsonUtils;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 @RestController
 @RequestMapping("/hello")
@@ -57,8 +56,40 @@ public class HelloController {
 	@Autowired
 	private RedisService redisService;
 
+	@Autowired
+	private HelloService helloService;
+
 	private static final String key = "LY_LY_Test_Queue_Inventory";
 	private static final String lock_key = "LY_LY_Test_Lock_Key";
+
+	public void testTx() {
+
+	}
+
+	@RequestMapping("/testEvent")
+	public void testApplicationEvent() {
+		ContextUtils.publishEvent(new CommonMessageEvent(" Hello World!"));
+		System.out.println("testApplicationEvent:" + System.currentTimeMillis());
+	}
+
+	@RequestMapping("/testContext")
+	public void testContext(HttpServletRequest request) {
+		WebApplicationContext rootContext = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
+		System.out.println(rootContext.getBean(HelloController.class));
+		WebApplicationContext childContext = RequestContextUtils.findWebApplicationContext(request);
+		System.out.println(childContext.getBean(HelloController.class));
+		String[] beanDefinitionNames = rootContext.getBeanDefinitionNames();
+		System.out.println(this);
+		System.out.println(Arrays.asList(beanDefinitionNames));
+		String[] beanDefinitionNames2 = childContext.getBeanDefinitionNames();
+		System.out.println(Arrays.asList(beanDefinitionNames2));
+	}
+
+	@RequestMapping("/testAop")
+	@ResponseBody
+	public void testAop() {
+		helloService.test1();
+	}
 
 	@RequestMapping(value = "/testJson", produces = { "text/json;charset=UTF-8" })
 	@ResponseBody
@@ -93,6 +124,7 @@ public class HelloController {
 			set.addAll(list);
 			resultMap.put(title, set);
 		}
+		//FileUtils.write(new File("D:\\aa.txt"), JsonUtils.marshal(resultMap).replace("\\\"", ""));
 		return JsonUtils.marshal(resultMap);
 	}
 

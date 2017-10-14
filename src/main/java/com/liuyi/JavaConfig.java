@@ -23,7 +23,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 @Configuration
 @ComponentScan(excludeFilters = { @Filter(type = FilterType.ANNOTATION, value = Controller.class) })
 @PropertySources({ @PropertySource("classpath:jdbc.properties"), @PropertySource("classpath:mail.properties") })
-@Import({ MybatisConfig.class, MailConfig.class })
+@Import({ MybatisConfig.class, MailConfig.class, AsyncAndScheduleConfig.class })
 public class JavaConfig implements EnvironmentAware {
 
 	private Environment env;

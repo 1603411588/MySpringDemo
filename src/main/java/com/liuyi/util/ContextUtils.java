@@ -1,6 +1,7 @@
 package com.liuyi.util;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.core.env.Environment;
 
 public class ContextUtils {
@@ -10,6 +11,10 @@ public class ContextUtils {
 
 	public static Object getBean(String name) {
 		return applicationContext.getBean(name);
+	}
+	
+	public static void publishEvent(ApplicationEvent event){
+		applicationContext.publishEvent(event);
 	}
 
 	public static <T> T getBean(String name, Class<T> requiredType) {
