@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.zxing.datamatrix.encoder.SymbolShapeHint;
 import com.liuyi.entity.Person;
 import com.liuyi.event.CommonMessageEvent;
 import com.liuyi.service.HelloService;
@@ -40,6 +41,10 @@ import com.liuyi.service.RedisLockService;
 import com.liuyi.service.RedisService;
 import com.liuyi.util.ContextUtils;
 import com.liuyi.util.JsonUtils;
+import com.liuyi.ws.weather.ArrayOfString;
+import com.liuyi.ws.weather.WeatherWS;
+import com.liuyi.ws.weather.WeatherWSSoap;
+import com.liuyi.ws.weather.GetRegionDatasetResponse.GetRegionDatasetResult;
 
 @RestController
 @RequestMapping("/hello")
@@ -72,9 +77,21 @@ public class HelloController {
 		System.out.println("testApplicationEvent:" + System.currentTimeMillis());
 	}
 
+	@RequestMapping("/textWS")
+	@ResponseBody
+	public List<String> testWS() {
+		WeatherWS weatherWS = new WeatherWS();
+		WeatherWSSoap weatherWSSoap = weatherWS.getWeatherWSSoap();
+		List<String> string = weatherWSSoap.getSupportCityString("31118").getString();
+		System.out.println(string);
+		List<String> list = weatherWSSoap.getWeather("1668", "").getString();
+		return list;
+	}
+
 	@RequestMapping("/testContext")
 	public void testContext(HttpServletRequest request) {
-		WebApplicationContext rootContext = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
+		WebApplicationContext rootContext = WebApplicationContextUtils
+				.getWebApplicationContext(request.getServletContext());
 		System.out.println(rootContext.getBean(HelloController.class));
 		WebApplicationContext childContext = RequestContextUtils.findWebApplicationContext(request);
 		System.out.println(childContext.getBean(HelloController.class));
@@ -124,7 +141,8 @@ public class HelloController {
 			set.addAll(list);
 			resultMap.put(title, set);
 		}
-		//FileUtils.write(new File("D:\\aa.txt"), JsonUtils.marshal(resultMap).replace("\\\"", ""));
+		// FileUtils.write(new File("D:\\aa.txt"),
+		// JsonUtils.marshal(resultMap).replace("\\\"", ""));
 		return JsonUtils.marshal(resultMap);
 	}
 
