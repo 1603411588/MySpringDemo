@@ -29,11 +29,36 @@ import org.xml.sax.XMLReader;
 import com.liuyi.util.JsonUtils;
 import com.liuyi.ws.hello.HelloServer;
 import com.liuyi.ws.hello.HelloServerService;
+import com.liuyi.ws.hello.Person;
 import com.liuyi.ws.translator.ArrayOfString;
 import com.liuyi.ws.translator.EnglishChinese;
 import com.liuyi.ws.translator.EnglishChineseSoap;
 
 public class WSTest {
+	
+	@Test
+	public void helloTest3()  throws Exception {
+		HelloServerService service = new HelloServerService(new URL("http://127.0.0.1:9999/ws/hello"));
+		HelloServer serverPort = service.getHelloServerPort();
+		
+		
+		Person p1 = new Person();
+		p1.setId(1L);
+		p1.setAge(23);
+		p1.setName("张三");
+		p1.setSex("男");
+		
+		Person p2 = new Person();
+		p2.setId(2L);
+		p2.setAge(24);
+		p2.setName("李四");
+		p2.setSex("女");
+		serverPort.addPerson(p1);
+		serverPort.addPerson(p2);
+		
+		List<Person> list = serverPort.getAllPerson();
+		System.out.println(list);
+	}
 
 	@Test
 	public void helloTest2() throws Exception {

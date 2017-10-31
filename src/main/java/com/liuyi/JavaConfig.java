@@ -10,7 +10,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
@@ -23,7 +22,6 @@ import com.alibaba.druid.pool.DruidDataSource;
 @Configuration
 @ComponentScan(excludeFilters = { @Filter(type = FilterType.ANNOTATION, value = Controller.class) })
 @PropertySources({ @PropertySource("classpath:jdbc.properties"), @PropertySource("classpath:mail.properties") })
-@Import({ MybatisConfig.class, MailConfig.class, AsyncAndScheduleConfig.class })
 public class JavaConfig implements EnvironmentAware {
 
 	private Environment env;
