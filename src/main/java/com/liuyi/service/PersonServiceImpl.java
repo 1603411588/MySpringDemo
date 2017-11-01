@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -39,6 +40,29 @@ public class PersonServiceImpl implements PersonService {
 		result.setRows(rows);
 		result.setTotal(total);
 		return result;
+	}
+	
+	@Override
+	@Transactional
+	public void testTx() throws Exception {
+		testTx2();
+		testTx3();
+	}
+	
+	@Transactional
+	public void testTx3() {
+		Person p = new Person();
+		p.setId(111L);
+		p.setName("tx1");
+		personMapper.add(p);
+	}
+	
+	@Transactional
+	public void testTx2(){
+		Person p2 = new Person();
+		p2.setId(112L);
+		p2.setName("tx2");
+		personMapper.add(p2);
 	}
 
 }

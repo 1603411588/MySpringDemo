@@ -9,8 +9,8 @@ import com.liuyi.event.CommonMessageEvent;
 @Component
 public class CommonMessageListener implements ApplicationListener<CommonMessageEvent> {
 
-	@Override
 	@Async
+	@Override
 	public void onApplicationEvent(CommonMessageEvent event) {
 		System.out.println(event.getSource());
 		System.out.println(event.getTimestamp());

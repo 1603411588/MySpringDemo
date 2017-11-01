@@ -20,7 +20,16 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,7 +41,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.RequestContextUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.zxing.datamatrix.encoder.SymbolShapeHint;
 import com.liuyi.entity.Person;
 import com.liuyi.event.CommonMessageEvent;
 import com.liuyi.service.HelloService;
@@ -41,16 +49,16 @@ import com.liuyi.service.RedisLockService;
 import com.liuyi.service.RedisService;
 import com.liuyi.util.ContextUtils;
 import com.liuyi.util.JsonUtils;
-import com.liuyi.ws.weather.ArrayOfString;
 import com.liuyi.ws.weather.WeatherWS;
 import com.liuyi.ws.weather.WeatherWSSoap;
-import com.liuyi.ws.weather.GetRegionDatasetResponse.GetRegionDatasetResult;
 
 @RestController
 @RequestMapping("/hello")
 public class HelloController {
 
 	private final static Logger logger = LoggerFactory.getLogger(HelloController.class);
+
+	public final static ThreadLocal<Object> threadLocal = new ThreadLocal<>();
 
 	@Autowired
 	private PersonService personService;
@@ -64,11 +72,48 @@ public class HelloController {
 	@Autowired
 	private HelloService helloService;
 
+	@Autowired
+	private AmqpTemplate amqpTemplate;
+
+	@Autowired
+	@Qualifier("connectionFactoryTest")
+	private ConnectionFactory connectionFactoryTest;
+
 	private static final String key = "LY_LY_Test_Queue_Inventory";
 	private static final String lock_key = "LY_LY_Test_Lock_Key";
 
-	public void testTx() {
+	@RequestMapping("/testTx2")
+	public void testTx2() {
+		PlatformTransactionManager transactionManager = (PlatformTransactionManager) ContextUtils.getBean("transactionManager");
+		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+		transactionTemplate.execute(new TransactionCallback<Object>() {
+			@Override
+			public Object doInTransaction(TransactionStatus status) {
+				return null;
+			}
+		});
+	}
 
+	@RequestMapping("/testMq2")
+	public void testMq2() {
+		RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactoryTest);
+		rabbitTemplate.convertAndSend("exchange.testhost.test", "queue.testhost.test1", "hello world");
+	}
+
+	@RequestMapping("/testMq")
+	public void testMq() {
+		Person p = new Person();
+		p.setId(1L);
+		p.setName("牛一");
+		p.setSex("男");
+		p.setIdCard("123456");
+		amqpTemplate.convertAndSend("exchange_test", "queue_mytest1", p);
+	}
+
+	@RequestMapping("/testTx")
+	public void testTx() throws Exception {
+		personService.testTx();
 	}
 
 	@RequestMapping("/testEvent")
@@ -77,7 +122,7 @@ public class HelloController {
 		System.out.println("testApplicationEvent:" + System.currentTimeMillis());
 	}
 
-	@RequestMapping("/textWS")
+	@RequestMapping("/testWS")
 	@ResponseBody
 	public List<String> testWS() {
 		WeatherWS weatherWS = new WeatherWS();
@@ -90,8 +135,7 @@ public class HelloController {
 
 	@RequestMapping("/testContext")
 	public void testContext(HttpServletRequest request) {
-		WebApplicationContext rootContext = WebApplicationContextUtils
-				.getWebApplicationContext(request.getServletContext());
+		WebApplicationContext rootContext = WebApplicationContextUtils.getWebApplicationContext(request.getServletContext());
 		System.out.println(rootContext.getBean(HelloController.class));
 		WebApplicationContext childContext = RequestContextUtils.findWebApplicationContext(request);
 		System.out.println(childContext.getBean(HelloController.class));

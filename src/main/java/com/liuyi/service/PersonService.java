@@ -12,5 +12,7 @@ public interface PersonService {
 	public void add(Person p);
 
 	public PageQueryResult<Person> pageQuery(Integer pageNum, Integer pageSize);
+	
+	public void testTx() throws Exception;
 
 }

@@ -11,7 +11,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 @Configuration
-@MapperScan(basePackages = { "com.liuyi.dao" })
+@MapperScan(basePackages = { "com.liuyi.*dao" })
 public class MybatisConfig {
 
 	@Bean

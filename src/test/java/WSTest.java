@@ -1,13 +1,9 @@
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-
-import javax.mail.Header;
-import javax.xml.parsers.SAXParser;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpHeaders;
@@ -19,12 +15,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
-import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.junit.Test;
-import org.xml.sax.XMLReader;
 
 import com.liuyi.util.JsonUtils;
 import com.liuyi.ws.hello.HelloServer;
@@ -34,7 +28,7 @@ import com.liuyi.ws.translator.EnglishChinese;
 import com.liuyi.ws.translator.EnglishChineseSoap;
 
 public class WSTest {
-
+	
 	@Test
 	public void helloTest2() throws Exception {
 		CloseableHttpClient httpClient = HttpClients.createDefault();

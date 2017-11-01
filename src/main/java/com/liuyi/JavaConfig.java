@@ -11,19 +11,23 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.alibaba.druid.pool.DruidDataSource;
 
 @Configuration
 @ComponentScan(excludeFilters = { @Filter(type = FilterType.ANNOTATION, value = Controller.class) })
-@PropertySources({ @PropertySource("classpath:jdbc.properties"), @PropertySource("classpath:mail.properties") })
+@PropertySources({ @PropertySource("classpath:application.properties") })
 @Import({ MybatisConfig.class, MailConfig.class, AsyncAndScheduleConfig.class })
+@ImportResource(locations = { "classpath:application-mq.xml" })
+@EnableTransactionManagement
 public class JavaConfig implements EnvironmentAware {
 
 	private Environment env;
@@ -40,7 +44,7 @@ public class JavaConfig implements EnvironmentAware {
 		return dataSource;
 	}
 
-	@Bean
+	@Bean(name = "transactionManager")
 	public DataSourceTransactionManager transactionManager(DataSource dataSource) {
 		DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
 		transactionManager.setDataSource(dataSource);

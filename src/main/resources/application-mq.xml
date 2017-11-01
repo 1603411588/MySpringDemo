@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/rabbit 
+			http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+	<description>rabbitmq config</description>
+
+	<context:property-placeholder location="classpath:rabbit.properties" />
+
+	<!-- 连接配置 -->
+	<rabbit:connection-factory id="connectionFactory"
+		host="${rabbit.host}" username="${rabbit.username}" password="${rabbit.password}"
+		port="${rabbit.port}" virtual-host="${rabbit.vhost}" />
+		
+	<rabbit:connection-factory id="connectionFactoryTest"
+		host="${rabbit.host}" username="${rabbit.username}" password="${rabbit.password}"
+		port="${rabbit.port}" virtual-host="${rabbit.test.vhost}" />
+
+	<rabbit:admin connection-factory="connectionFactory"  />
+
+	<!-- spring template声明 -->
+	<rabbit:template id="amqpTemplate" connection-factory="connectionFactory" message-converter="jsonMessageConverter" />
+
+	<!-- 消息对象json转换类 -->
+	<bean id="jsonMessageConverter"	class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter" />
+
+	<!-- queue -->
+	<rabbit:queue id="queue_mytest1" name="queue_mytest1" durable="true" auto-delete="false" exclusive="false" />
+
+	<rabbit:direct-exchange name="exchange_test" durable="true" auto-delete="false" id="exchange_test">
+		<rabbit:bindings>
+			<rabbit:binding queue="queue_mytest1" key="queue_mytest1" />
+		</rabbit:bindings>
+	</rabbit:direct-exchange>
+
+	<!-- 监听器 -->
+	<rabbit:listener-container	connection-factory="connectionFactory" acknowledge="auto" >
+		<rabbit:listener queues="queue_mytest1" ref="queueTestListener1" />
+	</rabbit:listener-container>
+
+</beans>

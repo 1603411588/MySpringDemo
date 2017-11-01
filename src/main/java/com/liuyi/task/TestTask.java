@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestTask {
 
-	@Scheduled(cron = "0 5 * * * ?")
+	@Scheduled(cron = "0 0/2 * * * ? ")
 	public void task1() {
 		System.out.println(DateFormatUtils.ISO_DATETIME_FORMAT.format(new Date()) + " task1 -  task1 - ");
 	}

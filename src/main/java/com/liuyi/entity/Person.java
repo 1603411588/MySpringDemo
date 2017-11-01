@@ -12,6 +12,11 @@ public class Person implements Serializable {
 	private Date birth;
 	private String idCard;
 
+	@Override
+	public String toString() {
+		return "Person [id=" + id + ", name=" + name + ", sex=" + sex + ", birth=" + birth + ", idCard=" + idCard + "]";
+	}
+
 	public Long getId() {
 		return id;
 	}
