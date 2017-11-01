@@ -18,12 +18,13 @@
 <script type="text/javascript"
 	src="http://cdn.bootcss.com/stomp.js/2.3.3/stomp.js"></script>
 </head>
-<body>
+<body style="background-color: #f8f8f8">
 	<textarea rows="20" cols="100" id="c1"></textarea>
-	<br/>
+	<br />
 	<button id="connect1" onclick="connect();">连接1</button>
-	<br/>
-	<input type="text" id="s1" style="width: 500px;height: 40px;"><button id="send1" onclick="send();">发送1</button>
+	<br />
+	<input type="text" id="s1" style="width: 500px; height: 40px;">
+	<button id="send1" onclick="send();">发送1</button>
 	<script type="text/javascript">
 		var stompClient;
 		function connect() {
@@ -39,8 +40,37 @@
 		}
 
 		function send() {
-			stompClient.send("/app/testHello",{}, $('#s1').val());
+			stompClient.send("/app/testHello", {}, $('#s1').val());
 		}
 	</script>
+
+	<hr />
+	<script type="text/javascript">
+		function GetQueryString(name){
+		     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+		     var r = window.location.search.substr(1).match(reg);
+		     if(r!=null)return  unescape(r[2]); return null;
+		}
+	</script>
+
+	<button id="send2" onclick="send2();">send</button>
+	<script type="text/javascript">
+		var id = GetQueryString("id");
+		var stompClient;
+		var socket = new SockJS("/MySpringDemo/stomp/testHello");
+		stompClient = Stomp.over(socket);//使用stomp子协议的WebSocket 客户端
+		stompClient.connect({}, function(frame) {//链接Web Socket的服务端。
+			console.log('Connected: ' + frame);
+			stompClient.subscribe('/user/'+ id +'/userMessage', function(response) {
+				console.log(response.body);
+			});
+		});
+
+		function send2() {
+			stompClient.send("/app/testHello", {}, $('#s1').val());
+		}
+	</script>
+	
+
 </body>
 </html>
