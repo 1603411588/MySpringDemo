@@ -12,12 +12,17 @@ public class PageController {
 	}
 
 	@RequestMapping("/console")
-	public String console(String page) {
+	public String console() {
 		return "console";
 	}
 	
 	@RequestMapping("/upload")
-	public String upload(String page) {
+	public String upload() {
 		return "upload";
+	}
+	
+	@RequestMapping("/stomp")
+	public String stomp() {
+		return "stomp";
 	}
 }

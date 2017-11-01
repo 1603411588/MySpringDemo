@@ -16,7 +16,7 @@
 	<script type="text/javascript">
 		//var url = "ws://" + window.location.host + "/MySpringDemo/websocket/WebsocketTest";
 		//var socket = new WebSocket(url);
-		var url = "http://localhost:8080/MySpringDemo/websocket/WebsocketTest";
+		var url = "http://" + window.location.host + "/MySpringDemo/websocket/WebsocketTest";
 		var socket = new SockJS(url);
 		socket.onopen = function(){
 			console.log(" connection open...");

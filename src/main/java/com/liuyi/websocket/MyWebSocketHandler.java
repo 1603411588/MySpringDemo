@@ -21,7 +21,7 @@ public class MyWebSocketHandler extends AbstractWebSocketHandler {
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		System.out.println(session.toString());
 		System.out.println("receive msg:" + message.getPayload());
-		Thread.sleep(2000);
+		Thread.sleep(20000);
 		session.sendMessage(new TextMessage(" pang ."));
 	}
 }
