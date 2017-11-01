@@ -1,6 +1,7 @@
 
 package com.liuyi.ws.hello;
 
+import java.util.List;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -38,5 +39,38 @@ public interface HelloServer {
     public String sayHello(
         @WebParam(name = "arg0", targetNamespace = "")
         String arg0);
+
+    /**
+     * 
+     */
+    @WebMethod
+    @RequestWrapper(localName = "deletePerson", targetNamespace = "http://server.ws.ly.com/", className = "com.liuyi.ws.hello.DeletePerson")
+    @ResponseWrapper(localName = "deletePersonResponse", targetNamespace = "http://server.ws.ly.com/", className = "com.liuyi.ws.hello.DeletePersonResponse")
+    @Action(input = "http://server.ws.ly.com/HelloServer/deletePersonRequest", output = "http://server.ws.ly.com/HelloServer/deletePersonResponse")
+    public void deletePerson();
+
+    /**
+     * 
+     * @param arg0
+     */
+    @WebMethod
+    @RequestWrapper(localName = "addPerson", targetNamespace = "http://server.ws.ly.com/", className = "com.liuyi.ws.hello.AddPerson")
+    @ResponseWrapper(localName = "addPersonResponse", targetNamespace = "http://server.ws.ly.com/", className = "com.liuyi.ws.hello.AddPersonResponse")
+    @Action(input = "http://server.ws.ly.com/HelloServer/addPersonRequest", output = "http://server.ws.ly.com/HelloServer/addPersonResponse")
+    public void addPerson(
+        @WebParam(name = "arg0", targetNamespace = "")
+        Person arg0);
+
+    /**
+     * 
+     * @return
+     *     returns java.util.List<com.liuyi.ws.hello.Person>
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "getAllPerson", targetNamespace = "http://server.ws.ly.com/", className = "com.liuyi.ws.hello.GetAllPerson")
+    @ResponseWrapper(localName = "getAllPersonResponse", targetNamespace = "http://server.ws.ly.com/", className = "com.liuyi.ws.hello.GetAllPersonResponse")
+    @Action(input = "http://server.ws.ly.com/HelloServer/getAllPersonRequest", output = "http://server.ws.ly.com/HelloServer/getAllPersonResponse")
+    public List<Person> getAllPerson();
 
 }

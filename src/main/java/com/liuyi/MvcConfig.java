@@ -13,12 +13,20 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+
+import com.liuyi.websocket.MyWebSocketHandler;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(useDefaultFilters = false, includeFilters = { @Filter(type = FilterType.ANNOTATION, value = Controller.class) })
-//@Import({ AspectConfig.class })
-public class MvcConfig extends WebMvcConfigurerAdapter {
+@EnableWebSocket
+@ComponentScan(useDefaultFilters = false, includeFilters = {
+		@Filter(type = FilterType.ANNOTATION, value = Controller.class) })
+// @Import({ AspectConfig.class })
+public class MvcConfig extends WebMvcConfigurerAdapter implements WebSocketConfigurer {
 
 	@Bean(name = "jspViewResolver")
 	public ViewResolver jspViewResolver() {
@@ -29,6 +37,13 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 		return resolver;
 	}
 
+	
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+		registry.addResourceHandler("/static/**").addResourceLocations("/static/");
+	}
+	
 	@Bean
 	public MultipartResolver multipartResolver() {
 		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
@@ -36,8 +51,12 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 	}
 
 	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		super.addResourceHandlers(registry);
-		registry.addResourceHandler("/static/**").addResourceLocations("/static/");
+	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+		registry.addHandler(webSocketHandler(), "/websocket/WebsocketTest").withSockJS();
+	}
+
+	@Bean
+	public WebSocketHandler webSocketHandler() {
+		return new MyWebSocketHandler();
 	}
 }
